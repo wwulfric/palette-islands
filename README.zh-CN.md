@@ -19,6 +19,20 @@
 所有通过 Vertico 读取的 minibuffer 都会显示为面板，无需改动命令本身。
 在文本终端里 minibuffer 留在回显区。
 
+## 截图
+
+命令列表，右侧是按键，页脚是选中命令的文档：
+
+![Commands 标签列出项目相关命令，带按键和文档](docs/commands.png)
+
+当前文件的结构，按类型分组：
+
+![Structure 标签按组列出文件里的变量和函数](docs/structure.png)
+
+光标处的面板，用于对当前符号做选择：
+
+![光标处符号下方的面板，列出它的用法](docs/point.png)
+
 ## 不加载个人配置的效果
 
 上方题图使用了个人 Emacs 配置。下图是在 `emacs -Q` 中仅加载 Palette Islands
@@ -193,7 +207,17 @@
 ### 供其他包使用
 
 在读取 minibuffer 的代码外 let 绑定 `palette-islands-placement`（`palette`、`point`，
-或 `nil` 表示回显区），用 `palette-islands-anchor` 让面板从按钮下方弹出。在 minibuffer 里，
+或 `nil` 表示回显区），用 `palette-islands-anchor` 让面板从按钮下方弹出：
+
+```elisp
+(let ((palette-islands-placement 'point))
+  (completing-read "Usages of atlas-search: "
+                   '("src/search.el:16  (defun atlas-search (index terms)"
+                     "test/search-tests.el:4  (atlas-search index '(\"rank\"))"
+                     "docs/usage.md:3  Call atlas-search with a list of terms.")))
+```
+
+在 minibuffer 里，
 `palette-islands-set-status`、`palette-islands-set-action`、`palette-islands-set-tabs`
 和 `palette-islands-set-prefix` 用于填写页眉和页脚。
 

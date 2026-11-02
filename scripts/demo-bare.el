@@ -20,12 +20,12 @@
 (palette-islands-demo-write "README.md" "# Atlas\n\nA small search engine.\n")
 (palette-islands-demo-write "LICENSE" "Demo fixture for Palette Islands screenshots.\n")
 (palette-islands-demo-write "docs/ranking.md" "# Ranking\n\nRank documents by matched terms.\n")
-(palette-islands-demo-write "docs/usage.md" "# Usage\n\nSearch the index with a list of terms.\n")
+(palette-islands-demo-write "docs/usage.md" "# Usage\n\nCall atlas-search with a list of terms.\n")
 (palette-islands-demo-write "src/index.el" ";;; index.el --- Build an index -*- lexical-binding: t; -*-\n\n(provide 'index)\n")
 (palette-islands-demo-write
  "src/search.el"
- ";;; search.el --- Search an index -*- lexical-binding: t; -*-\n\n(require 'cl-lib)\n\n(defun atlas-search (index terms)\n  \"Rank documents matching TERMS in INDEX.\"\n  (let ((scores (make-hash-table)))\n    (dolist (term terms)\n      (dolist (doc (gethash term index))\n        (cl-incf (gethash doc scores 0))))\n    (sort (hash-table-keys scores)\n          (lambda (a b)\n            (> (gethash a scores)\n               (gethash b scores))))))\n\n(provide 'search)\n")
-(palette-islands-demo-write "test/search-tests.el" ";;; Search ranking tests\n(require 'ert)\n")
+ ";;; search.el --- Search an index -*- lexical-binding: t; -*-\n\n(require 'cl-lib)\n\n(defvar atlas-stop-words '(\"a\" \"an\" \"the\")\n  \"Terms left out of a search.\")\n\n(defun atlas-terms (query)\n  \"Split QUERY into terms to search for.\"\n  (seq-difference (split-string (downcase query)) atlas-stop-words))\n\n(defun atlas-score (doc terms index)\n  \"Count how many of TERMS match DOC in INDEX.\"\n  (seq-count (lambda (term) (member doc (gethash term index))) terms))\n\n(defun atlas-search (index terms)\n  \"Rank documents matching TERMS in INDEX.\"\n  (let ((scores (make-hash-table)))\n    (dolist (term terms)\n      (dolist (doc (gethash term index))\n        (cl-incf (gethash doc scores 0))))\n    (sort (hash-table-keys scores)\n          (lambda (a b)\n            (> (gethash a scores)\n               (gethash b scores))))))\n\n(provide 'search)\n")
+(palette-islands-demo-write "test/search-tests.el" ";;; Search ranking tests\n(require 'ert)\n\n(atlas-search index '(\"rank\"))\n")
 
 ;; Make it a project, for `project-find-file'.  No commit is needed.
 (let ((default-directory palette-islands-demo-root))

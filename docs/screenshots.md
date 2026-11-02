@@ -1,6 +1,7 @@
 # Screenshots
 
-`hero.png` shows Palette Islands inside a personal Emacs configuration.
+`hero.png`, `commands.png`, `structure.png` and `point.png` show Palette Islands
+inside a personal Emacs configuration.
 `emacs-q.png` is a real window capture of graphical Emacs 31.1 on macOS,
 started with `-Q`: no init file, theme, font changes or Palette Islands
 customization. Only the package and its dependencies are loaded. The window
@@ -40,10 +41,13 @@ window stands out on both light and dark pages. The window's pixels are unchange
 
 ## Personal configuration capture
 
-The current `hero.png` loads the actual `.emacs.d/early-init.el` and
-`.emacs.d/init.el`, including its theme, islands, tabs and sidebar, in a
-separate graphical Emacs process, followed by the same demo script. Runtime
-files are redirected to a temporary `user-emacs-directory`; the existing
-Tree-sitter grammars are linked there. The frame is resized to 1300 × 830
-content pixels and `sea` is typed into the search window. It is a window capture,
-including native window chrome, with the margin described above.
+These images load the actual `.emacs.d/early-init.el` and `.emacs.d/init.el`,
+including its theme, islands, tabs and sidebar, in a separate graphical Emacs
+process, followed by the same demo script. Runtime files are redirected to a
+temporary `user-emacs-directory`; the existing Tree-sitter grammars are linked
+there. The frame is resized to 1100 × 700 content pixels. In the search window,
+`hero.png` has `sea` typed, `commands.png` `>project` and `structure.png` `@`.
+`point.png` runs the snippet under "For other packages" in the README, with
+point on `atlas-search`; its three candidates are written by hand, and name
+real lines of the demo project. They are window captures, including native
+window chrome, with the margin described above.

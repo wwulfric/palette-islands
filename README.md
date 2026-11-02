@@ -23,6 +23,21 @@ A JetBrains-style floating panel for the Emacs minibuffer, on top of
 Every minibuffer that reads through Vertico gets the panel, with no changes to
 the commands. On text terminals the minibuffer stays in the echo area.
 
+## Screenshots
+
+Commands, with their keys at the right and the selected one's documentation in
+the footer:
+
+![The Commands tab listing project commands, with key bindings and documentation](docs/commands.png)
+
+This file's structure, grouped by kind:
+
+![The Structure tab listing a file's variables and functions in groups](docs/structure.png)
+
+A panel at point, for choices about the symbol under it:
+
+![A panel below the symbol at point, listing its usages](docs/point.png)
+
 ## Without an Emacs configuration
 
 The title image above uses a personal Emacs configuration. Here is Palette
@@ -209,7 +224,17 @@ with `(load "/path/to/palette-islands/examples/style.el")`.
 
 Let-bind `palette-islands-placement` around code that reads from the minibuffer
 (`palette`, `point`, or `nil` for the echo area), and `palette-islands-anchor` to
-drop a panel from a button. In the minibuffer, `palette-islands-set-status`,
+drop a panel from a button:
+
+```elisp
+(let ((palette-islands-placement 'point))
+  (completing-read "Usages of atlas-search: "
+                   '("src/search.el:16  (defun atlas-search (index terms)"
+                     "test/search-tests.el:4  (atlas-search index '(\"rank\"))"
+                     "docs/usage.md:3  Call atlas-search with a list of terms.")))
+```
+
+In the minibuffer, `palette-islands-set-status`,
 `palette-islands-set-action`, `palette-islands-set-tabs` and
 `palette-islands-set-prefix` fill the header and footer.
 
