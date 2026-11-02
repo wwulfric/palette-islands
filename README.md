@@ -25,26 +25,19 @@ the commands. On text terminals the minibuffer stays in the echo area.
 
 ## Screenshots
 
-Commands, with their keys at the right and the selected one's documentation in
-the footer:
+<table>
+  <tr>
+    <td width="50%" valign="top">Commands, with keys and documentation<br><a href="docs/commands.png"><img src="docs/commands.png" alt="The Commands tab listing project commands, with key bindings and documentation"></a></td>
+    <td width="50%" valign="top">This file's structure, grouped by kind<br><a href="docs/structure.png"><img src="docs/structure.png" alt="The Structure tab listing a file's variables and functions in groups"></a></td>
+  </tr>
+  <tr>
+    <td width="50%" valign="top">A panel at the symbol at point<br><a href="docs/point.png"><img src="docs/point.png" alt="A panel below the symbol at point, listing its usages"></a></td>
+    <td width="50%" valign="top"><code>emacs -Q</code>, with no configuration<br><a href="docs/emacs-q.png"><img src="docs/emacs-q.png" alt="Palette Islands in emacs -Q: the search window over a source file"></a></td>
+  </tr>
+</table>
 
-![The Commands tab listing project commands, with key bindings and documentation](docs/commands.png)
-
-This file's structure, grouped by kind:
-
-![The Structure tab listing a file's variables and functions in groups](docs/structure.png)
-
-A panel at point, for choices about the symbol under it:
-
-![A panel below the symbol at point, listing its usages](docs/point.png)
-
-## Without an Emacs configuration
-
-The title image above uses a personal Emacs configuration. Here is Palette
-Islands in `emacs -Q`, loading only the package and its dependencies, with
-default fonts, faces and toolbar. [Reproduce this demo](docs/screenshots.md).
-
-![Palette Islands in emacs -Q: the search window over a source file](docs/emacs-q.png)
+All but the last use a personal Emacs configuration; the last keeps default fonts,
+faces and toolbar. [Reproduce it](docs/screenshots.md).
 
 ## Requirements
 

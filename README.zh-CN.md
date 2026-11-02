@@ -21,25 +21,19 @@
 
 ## 截图
 
-命令列表，右侧是按键，页脚是选中命令的文档：
+<table>
+  <tr>
+    <td width="50%" valign="top">命令列表，带按键和文档<br><a href="docs/commands.png"><img src="docs/commands.png" alt="Commands 标签列出项目相关命令，带按键和文档"></a></td>
+    <td width="50%" valign="top">当前文件的结构，按类型分组<br><a href="docs/structure.png"><img src="docs/structure.png" alt="Structure 标签按组列出文件里的变量和函数"></a></td>
+  </tr>
+  <tr>
+    <td width="50%" valign="top">光标处符号下方的面板<br><a href="docs/point.png"><img src="docs/point.png" alt="光标处符号下方的面板，列出它的用法"></a></td>
+    <td width="50%" valign="top"><code>emacs -Q</code>，不加载个人配置<br><a href="docs/emacs-q.png"><img src="docs/emacs-q.png" alt="emacs -Q 下的 Palette Islands：源文件上方的搜索窗口"></a></td>
+  </tr>
+</table>
 
-![Commands 标签列出项目相关命令，带按键和文档](docs/commands.png)
-
-当前文件的结构，按类型分组：
-
-![Structure 标签按组列出文件里的变量和函数](docs/structure.png)
-
-光标处的面板，用于对当前符号做选择：
-
-![光标处符号下方的面板，列出它的用法](docs/point.png)
-
-## 不加载个人配置的效果
-
-上方题图使用了个人 Emacs 配置。下图是在 `emacs -Q` 中仅加载 Palette Islands
-及其依赖的真实截图，保留默认字体、配色和工具栏。
+前三张使用了个人 Emacs 配置；最后一张保留默认字体、配色和工具栏。
 [复现这个演示](docs/screenshots.md)。
-
-![emacs -Q 下的 Palette Islands：源文件上方的搜索窗口](docs/emacs-q.png)
 
 ## 依赖
 
