@@ -30,9 +30,13 @@ this checkout or your Emacs configuration. The project's path is available in
 `palette-islands-demo-root` and in `*Messages*`; it can be removed after
 closing the demo Emacs.
 
-Wait for the panel to appear, then capture the Emacs window. The committed PNG
-includes the native title bar and toolbar, without the desktop or a window
-shadow. No UI elements are redrawn or composited.
+Wait for the panel to appear, then capture the Emacs window, without the
+desktop or the system's window shadow. The capture includes the native title
+bar and toolbar. No UI elements are redrawn or composited.
+
+Each committed PNG then gets a transparent 28-point margin holding a soft drop
+shadow and a thin gray outline, following the window's own shape, so that the
+window stands out on both light and dark pages. The window's pixels are unchanged.
 
 ## Personal configuration capture
 
@@ -41,5 +45,5 @@ The current `hero.png` loads the actual `.emacs.d/early-init.el` and
 separate graphical Emacs process, followed by the same demo script. Runtime
 files are redirected to a temporary `user-emacs-directory`; the existing
 Tree-sitter grammars are linked there. The frame is resized to 1300 × 830
-content pixels and `sea` is typed into the search window. It is a direct window
-capture, including native window chrome.
+content pixels and `sea` is typed into the search window. It is a window capture,
+including native window chrome, with the margin described above.
