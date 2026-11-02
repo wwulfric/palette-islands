@@ -25,6 +25,32 @@
   (should (eq (keymap-lookup palette-islands-command-map "s")
               #'palette-islands-search)))
 
+(ert-deftest palette-islands-search-take-input-forgets ()
+  "A kind's opening input is taken once, and kinds keep theirs apart."
+  (let ((palette-islands-search--opened nil))
+    (setf (alist-get 'structure palette-islands-search--opened) "foo"
+          (alist-get 'text palette-islands-search--opened) "bar")
+    (should (equal (palette-islands-search-take-input 'structure) "foo"))
+    (should-not (palette-islands-search-take-input 'structure))
+    (should (equal (palette-islands-search-take-input 'text) "bar"))))
+
+(ert-deftest palette-islands-candidate-detail-by-category ()
+  "The footer tells a command's documentation and a tagged item's own text."
+  (let ((vertico--metadata '(metadata (category . command))))
+    (should (equal (palette-islands-candidate-detail "forward-char")
+                   (car (split-string (documentation 'forward-char) "\n"))))
+    (should (equal (palette-islands-candidate-detail
+                    (propertize "x" 'palette-islands-detail "Own"))
+                   "Own"))
+    (should-not (palette-islands-candidate-detail "no-such-command-here"))))
+
+(ert-deftest palette-islands-candidates-stay-outside-a-panel ()
+  "Without a panel, a file candidate reaches Vertico unchanged."
+  (let ((vertico--metadata '(metadata (category . file))))
+    (should (equal (palette-islands-candidates-format
+                    (lambda (candidate &rest _) candidate) "a/b.el" "" "")
+                   "a/b.el"))))
+
 (ert-deftest palette-islands-mode-toggles ()
   "The mode's hooks and advice come and go with it."
   (unwind-protect

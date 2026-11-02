@@ -16,6 +16,9 @@ A JetBrains-style floating panel for the Emacs minibuffer, on top of
 - **Search window**: one window for files, commands, structure, line and text,
   as in Search Everywhere and VS Code's quick open. A typed prefix switches the
   kind; tabs in the header show it and switch on click.
+- **Candidates**: names before their faded directories, icons of files and
+  buffers, and in the footer the selected one's full location or documentation,
+  as in JetBrains' Search Everywhere.
 
 Every minibuffer that reads through Vertico gets the panel, with no changes to
 the commands. On text terminals the minibuffer stays in the echo area.
@@ -24,23 +27,25 @@ the commands. On text terminals the minibuffer stays in the echo area.
 
 The title image above uses a personal Emacs configuration. Here is Palette
 Islands in `emacs -Q`, loading only the package and its dependencies, with
-default fonts, faces and toolbar. Icons and details come from the editor, so
-this one has none. [Reproduce this demo](docs/screenshots.md).
+default fonts, faces and toolbar. [Reproduce this demo](docs/screenshots.md).
 
 ![Palette Islands in emacs -Q: the search window over a source file](docs/emacs-q.png)
 
 ## Requirements
 
-- Emacs 29.1 or later, with SVG support for the corners, the selected row and icons
+- Emacs 29.1 or later, with SVG support for the corners, the selected row and
+  icons. It is tested on Emacs 31.1 only; please report problems on older versions
 - [Vertico](https://github.com/minad/vertico) 2.0 or later
 - [posframe](https://github.com/tumashu/posframe) 1.4 or later
 - [expui-icons](https://github.com/wwulfric/expui-icons) 0.2.2 or later
 - Optional: [Consult](https://github.com/minad/consult), for richer search kinds
 
-The panel advises internal functions of its dependencies:
+The panel relies on internals of its dependencies: it advises
 `vertico--display-candidates`, `vertico--format-candidate`,
-`vertico--resize-window` and `posframe--fit-frame-to-buffer`. It is tested with
-Vertico 2.15 and posframe 1.5.3; other versions may need changes.
+`vertico--format-group-title`, `vertico--resize-window` and
+`posframe--fit-frame-to-buffer`, and reads `vertico--index`, `vertico--metadata`
+and `posframe--frame`. It is tested with Vertico 2.15 and posframe 1.5.3; other
+versions may need changes.
 
 ## Install
 
@@ -183,8 +188,8 @@ attributes. The other faces, in the `palette-islands` group, are
 `-border`), `-title`, `-divider`, `-tab`, `-tab-active` and `-header`. The
 selected row takes its color from Vertico's `vertico-current`.
 
-[examples/style.el](examples/style.el) combines these settings, with file icons
-and command details, into an optional, standalone file. Load it after your theme
+[examples/style.el](examples/style.el) combines these settings into an optional,
+standalone file. Load it after your theme
 with `(load "/path/to/palette-islands/examples/style.el")`.
 
 ### Editor integration
@@ -192,8 +197,9 @@ with `(load "/path/to/palette-islands/examples/style.el")`.
 | Variable | Contract and default |
 |---|---|
 | `palette-islands-background-function` | No arguments; returns an Emacs color string or `nil`. Called when the panel shows; its cut-off corners paint this color. Default `nil` uses the default face's background. |
-| `palette-islands-icon-function` | Receives a candidate; returns a string displaying an image, or `nil`. Default `nil` shows no icons. |
-| `palette-islands-detail-function` | Receives a candidate; returns its location or description for the footer, or `nil`. Default `nil` shows nothing. |
+| `palette-islands-icon-function` | Receives a candidate; returns a string displaying an image, or `nil`. Default `palette-islands-candidate-icon` shows icons of files and buffers. Set `nil` for none. |
+| `palette-islands-detail-function` | Receives a candidate; returns its location or description for the footer, or `nil`. Default `palette-islands-candidate-detail` knows files, buffers, matches and documented symbols. Set `nil` for none. |
+| `palette-islands-project-root-function` | No arguments; returns a directory or `nil`. Candidates' directories show relative to it. Default `nil` uses the project of the buffer the minibuffer was opened from. |
 | `palette-islands-titles` | Panel titles by command. |
 | `palette-islands-category-titles` | Panel titles by completion category, for completions no command opened. Other panels take their prompt as title. |
 | `palette-islands-ignore-commands` | Commands whose minibuffer stays in the echo area. Default empty. |
@@ -206,6 +212,16 @@ Let-bind `palette-islands-placement` around code that reads from the minibuffer
 drop a panel from a button. In the minibuffer, `palette-islands-set-status`,
 `palette-islands-set-action`, `palette-islands-set-tabs` and
 `palette-islands-set-prefix` fill the header and footer.
+
+To lay out candidates of your own, `palette-islands-indent` is the pixels before
+their text, `palette-islands-text-width` the columns for it, and
+`palette-islands-candidates-text-end` the `:align-to` position where right-aligned
+text ends. A candidate can choose its icon and footer with the text properties
+`palette-islands-icon`, an expui icon's name, and `palette-islands-detail`.
+
+A command whose candidates arrive later, such as from a language server, can
+reopen its kind by `palette-islands-search-run`, with the input it was opened with
+from `palette-islands-search-take-input`.
 
 ## Development
 

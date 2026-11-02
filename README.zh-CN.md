@@ -13,6 +13,8 @@
 - **两种位置**：`palette` 在窗口顶部，`point` 在光标处的符号或按钮下方。
 - **搜索窗口**：一个窗口搜索文件、命令、结构、行和文本，类似 Search Everywhere 和
   VS Code 的 quick open。输入前缀可切换类型；页眉的标签显示当前类型，也能点击切换。
+- **候选项**：文件名在前、目录淡化靠右，文件和 buffer 带图标，页脚显示选中项的完整位置或文档，
+  类似 JetBrains 的 Search Everywhere。
 
 所有通过 Vertico 读取的 minibuffer 都会显示为面板，无需改动命令本身。
 在文本终端里 minibuffer 留在回显区。
@@ -20,23 +22,24 @@
 ## 不加载个人配置的效果
 
 上方题图使用了个人 Emacs 配置。下图是在 `emacs -Q` 中仅加载 Palette Islands
-及其依赖的真实截图，保留默认字体、配色和工具栏。图标和详情由编辑器提供，所以这里没有。
+及其依赖的真实截图，保留默认字体、配色和工具栏。
 [复现这个演示](docs/screenshots.md)。
 
 ![emacs -Q 下的 Palette Islands：源文件上方的搜索窗口](docs/emacs-q.png)
 
 ## 依赖
 
-- Emacs 29.1 或更高版本，需支持 SVG（用于绘制圆角、选中行和图标）
+- Emacs 29.1 或更高版本，需支持 SVG（用于绘制圆角、选中行和图标）。目前只在 Emacs 31.1 上测试过，
+  旧版本如有问题欢迎反馈
 - [Vertico](https://github.com/minad/vertico) 2.0 或更高版本
 - [posframe](https://github.com/tumashu/posframe) 1.4 或更高版本
 - [expui-icons](https://github.com/wwulfric/expui-icons) 0.2.2 或更高版本
 - 可选：[Consult](https://github.com/minad/consult)，提供更丰富的搜索类型
 
-面板 advice 了依赖的内部函数：`vertico--display-candidates`、
-`vertico--format-candidate`、`vertico--resize-window` 和
-`posframe--fit-frame-to-buffer`。已在 Vertico 2.15 和 posframe 1.5.3 上测试，
-其他版本可能需要调整。
+面板依赖其依赖包的内部实现：advice 了 `vertico--display-candidates`、
+`vertico--format-candidate`、`vertico--format-group-title`、`vertico--resize-window` 和
+`posframe--fit-frame-to-buffer`，并读取 `vertico--index`、`vertico--metadata` 和
+`posframe--frame`。已在 Vertico 2.15 和 posframe 1.5.3 上测试，其他版本可能需要调整。
 
 ## 安装
 
@@ -171,7 +174,7 @@
 `-title`、`-divider`、`-tab`、`-tab-active` 和 `-header`。选中行的颜色取自 Vertico 的
 `vertico-current`。
 
-[examples/style.el](examples/style.el) 把这些设置和文件图标、命令详情合成一个可选的独立文件。
+[examples/style.el](examples/style.el) 把这些设置合成一个可选的独立文件。
 在主题之后用 `(load "/path/to/palette-islands/examples/style.el")` 加载。
 
 ### 与编辑器对接
@@ -179,8 +182,9 @@
 | 变量 | 约定和默认值 |
 |---|---|
 | `palette-islands-background-function` | 无参数，返回 Emacs 颜色字符串或 `nil`。面板显示时调用，切掉的圆角涂这个颜色。默认 `nil` 用 default face 的背景。 |
-| `palette-islands-icon-function` | 接收候选项，返回显示图片的字符串或 `nil`。默认 `nil` 不显示图标。 |
-| `palette-islands-detail-function` | 接收候选项，返回页脚显示的位置或说明，或 `nil`。默认 `nil` 不显示。 |
+| `palette-islands-icon-function` | 接收候选项，返回显示图片的字符串或 `nil`。默认 `palette-islands-candidate-icon` 显示文件和 buffer 的图标。设为 `nil` 不显示。 |
+| `palette-islands-detail-function` | 接收候选项，返回页脚显示的位置或说明，或 `nil`。默认 `palette-islands-candidate-detail` 支持文件、buffer、搜索结果和有文档的符号。设为 `nil` 不显示。 |
+| `palette-islands-project-root-function` | 无参数，返回目录或 `nil`。候选项的目录相对它显示。默认 `nil` 用打开 minibuffer 的 buffer 所在项目。 |
 | `palette-islands-titles` | 按命令指定面板标题。 |
 | `palette-islands-category-titles` | 按补全类别指定标题，用于不是由命令打开的补全。其余面板以 prompt 为标题。 |
 | `palette-islands-ignore-commands` | 这些命令的 minibuffer 留在回显区。默认为空。 |
@@ -192,6 +196,13 @@
 或 `nil` 表示回显区），用 `palette-islands-anchor` 让面板从按钮下方弹出。在 minibuffer 里，
 `palette-islands-set-status`、`palette-islands-set-action`、`palette-islands-set-tabs`
 和 `palette-islands-set-prefix` 用于填写页眉和页脚。
+
+要自己排版候选项：`palette-islands-indent` 是文字前的像素，`palette-islands-text-width` 是可用列数，
+`palette-islands-candidates-text-end` 是右对齐文字结束处的 `:align-to` 位置。候选项可以用文本属性
+`palette-islands-icon`（expui 图标名）和 `palette-islands-detail` 指定自己的图标和页脚。
+
+候选项稍后才到的命令（比如来自语言服务器），可以用 `palette-islands-search-run` 重新打开所属类型，
+打开时的输入从 `palette-islands-search-take-input` 取得。
 
 ## 开发
 

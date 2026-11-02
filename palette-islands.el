@@ -53,6 +53,7 @@
 (require 'vertico)
 (require 'palette-islands-env)
 (require 'palette-islands-draw)
+(require 'palette-islands-candidates)
 
 (defvar vertico--index)
 (defvar vertico--total)
@@ -1135,6 +1136,7 @@ start of the text; let it happen first, or it undoes the hiding."
       (progn
         (add-hook 'minibuffer-setup-hook #'palette-islands--setup 50)
         (add-hook 'minibuffer-exit-hook #'palette-islands--nested-exit)
+        (add-hook 'minibuffer-setup-hook #'palette-islands-candidates-forget-roots)
         (advice-add 'posframe--fit-frame-to-buffer :around #'palette-islands--fit)
         (keymap-set vertico-map "<wheel-up>" #'palette-islands-scroll)
         (keymap-set vertico-map "<wheel-down>" #'palette-islands-scroll)
@@ -1142,6 +1144,9 @@ start of the text; let it happen first, or it undoes the hiding."
         (advice-add 'vertico--resize-window :around #'palette-islands--vertico-resize)
         (advice-add 'vertico--display-candidates :filter-args
                     #'palette-islands--divider-args)
+        ;; Before the panel's own, which wraps it with the row and the icon.
+        (advice-add 'vertico--format-candidate :around
+                    #'palette-islands-candidates-format)
         (advice-add 'vertico--format-candidate :around
                     #'palette-islands--format-candidate)
         (advice-add 'vertico--format-group-title :filter-return
@@ -1154,6 +1159,7 @@ start of the text; let it happen first, or it undoes the hiding."
                                                consult-after-jump-hook)))))))
     (remove-hook 'minibuffer-setup-hook #'palette-islands--setup)
     (remove-hook 'minibuffer-exit-hook #'palette-islands--nested-exit)
+    (remove-hook 'minibuffer-setup-hook #'palette-islands-candidates-forget-roots)
     (advice-remove 'posframe--fit-frame-to-buffer #'palette-islands--fit)
     (keymap-unset vertico-map "<wheel-up>")
     (keymap-unset vertico-map "<wheel-down>")
@@ -1161,6 +1167,7 @@ start of the text; let it happen first, or it undoes the hiding."
     (advice-remove 'vertico--resize-window #'palette-islands--vertico-resize)
     (advice-remove 'vertico--display-candidates #'palette-islands--divider-args)
     (advice-remove 'vertico--format-candidate #'palette-islands--format-candidate)
+    (advice-remove 'vertico--format-candidate #'palette-islands-candidates-format)
     (advice-remove 'vertico--format-group-title #'palette-islands--format-group-title)
     (when (boundp 'consult-after-jump-hook)
       (setq consult-after-jump-hook

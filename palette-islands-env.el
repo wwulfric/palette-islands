@@ -6,8 +6,8 @@
 ;;; Commentary:
 ;; The panel draws itself, but some things belong to the editor it floats
 ;; in: the color under its cut-off corners, the icon and detail of a
-;; candidate, the commands it names or leaves alone, and the kinds of the
-;; search window.  Each is a variable here, set to plain defaults that work
+;; candidate, the project being worked on, the commands it names or leaves
+;; alone, and the kinds of the search window.  Each is a variable here, set to plain defaults that work
 ;; in any Emacs; a configuration sets them to its own, and the panel never
 ;; calls into it itself.  Faces are the panel's own, in palette-islands.el.
 
@@ -25,16 +25,32 @@ returning nil, means the default face's background on the editor's frame."
   :type '(choice (const nil) function)
   :group 'palette-islands)
 
-(defcustom palette-islands-icon-function nil
+(defcustom palette-islands-icon-function 'palette-islands-candidate-icon
   "Function given a candidate, returning its icon as a string, or nil.
-The string displays an image in its `display' property.  Nil shows no icons."
+The string displays an image in its `display' property.  The default shows
+icons of files and buffers (palette-islands-candidates.el).  Nil shows none."
   :type '(choice (const nil) function)
   :group 'palette-islands)
 
-(defcustom palette-islands-detail-function nil
+(defcustom palette-islands-detail-function 'palette-islands-candidate-detail
   "Function given a candidate, returning text for the panel's footer, or nil.
-It tells the candidate's full location or description.  Nil shows nothing."
+It tells the candidate's full location or description.  The default knows
+files, buffers, matches and documented symbols
+\(palette-islands-candidates.el).  Nil shows nothing."
   :type '(choice (const nil) function)
+  :group 'palette-islands)
+
+(defcustom palette-islands-project-root-function nil
+  "Function returning the root of the project being worked on, or nil.
+Called without arguments in the minibuffer; candidates' directories are
+shown relative to it.  Nil, or a function returning nil, means the project
+of the buffer the minibuffer was opened from."
+  :type '(choice (const nil) function)
+  :group 'palette-islands)
+
+(defcustom palette-islands-annotation-height 0.85
+  "Height of candidates' directories and annotations relative to their names."
+  :type 'number
   :group 'palette-islands)
 
 (defcustom palette-islands-titles

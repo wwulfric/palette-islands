@@ -30,8 +30,8 @@
 (defvar palette-islands-search--input nil
   "Input that the search window being opened starts with.")
 
-(defvar palette-islands-search-structure-input nil
-  "Input for the structure that a language server is still listing.")
+(defvar palette-islands-search--opened nil
+  "Input that each kind was last opened with, as (KIND . INPUT).")
 
 (defvar-local palette-islands-search--current nil
   "Kind of results in this minibuffer.")
@@ -60,8 +60,7 @@ The panel stays up for KIND, whose command may read only later."
               (pcase-let ((`(,kind ,input ,command) next))
                 (let ((palette-islands-search--kind kind)
                       (palette-islands-search--input input))
-                  (when (eq kind 'structure)
-                    (setq palette-islands-search-structure-input input))
+                  (setf (alist-get kind palette-islands-search--opened) input)
                   (let* ((command (or command (nth 3 (assq kind palette-islands-search-kinds))))
                          ;; Consult reads its per-command settings, such as
                          ;; previews, by `this-command'.
@@ -108,6 +107,13 @@ Text searches keep it: they may start with any character."
 
 (defvar-keymap palette-islands-search-map
   "DEL" #'palette-islands-search-backspace)
+
+(defun palette-islands-search-take-input (kind)
+  "Return the input KIND was last opened with, and forget it.
+A command whose candidates arrive later, such as from a language server,
+reopens KIND with this by `palette-islands-search-run'."
+  (prog1 (alist-get kind palette-islands-search--opened)
+    (setf (alist-get kind palette-islands-search--opened nil t) nil)))
 
 ;;;; Tabs
 
