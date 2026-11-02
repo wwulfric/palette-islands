@@ -27,17 +27,34 @@ the commands. On text terminals the minibuffer stays in the echo area.
 
 <table>
   <tr>
-    <td width="50%" valign="top">Commands, with keys and documentation<br><a href="docs/commands.png"><img src="docs/commands.png" alt="The Commands tab listing project commands, with key bindings and documentation"></a></td>
-    <td width="50%" valign="top">This file's structure, grouped by kind<br><a href="docs/structure.png"><img src="docs/structure.png" alt="The Structure tab listing a file's variables and functions in groups"></a></td>
+    <th width="50%">Personal configuration</th>
+    <th width="50%"><code>emacs -Q</code></th>
   </tr>
   <tr>
-    <td width="50%" valign="top">A panel at the symbol at point<br><a href="docs/point.png"><img src="docs/point.png" alt="A panel below the symbol at point, listing its usages"></a></td>
-    <td width="50%" valign="top"><code>emacs -Q</code>, with no configuration<br><a href="docs/emacs-q.png"><img src="docs/emacs-q.png" alt="Palette Islands in emacs -Q: the search window over a source file"></a></td>
+    <td colspan="2">Commands, with their keys and documentation</td>
+  </tr>
+  <tr>
+    <td valign="top"><a href="docs/commands.png"><img src="docs/commands.png" alt="Commands in a personal configuration"></a></td>
+    <td valign="top"><a href="docs/emacs-q-commands.png"><img src="docs/emacs-q-commands.png" alt="Commands in emacs -Q"></a></td>
+  </tr>
+  <tr>
+    <td colspan="2">This file's structure, grouped by kind where the source does</td>
+  </tr>
+  <tr>
+    <td valign="top"><a href="docs/structure.png"><img src="docs/structure.png" alt="Structure in a personal configuration"></a></td>
+    <td valign="top"><a href="docs/emacs-q-structure.png"><img src="docs/emacs-q-structure.png" alt="Structure in emacs -Q"></a></td>
+  </tr>
+  <tr>
+    <td colspan="2">A panel at the symbol at point</td>
+  </tr>
+  <tr>
+    <td valign="top"><a href="docs/point.png"><img src="docs/point.png" alt="A panel at point in a personal configuration"></a></td>
+    <td valign="top"><a href="docs/emacs-q-point.png"><img src="docs/emacs-q-point.png" alt="A panel at point in emacs -Q"></a></td>
   </tr>
 </table>
 
-All but the last use a personal Emacs configuration; the last keeps default fonts,
-faces and toolbar. [Reproduce it](docs/screenshots.md).
+The right column keeps default fonts, faces and toolbar, loading only the package
+and its dependencies. [Reproduce it](docs/screenshots.md).
 
 ## Requirements
 
@@ -57,9 +74,11 @@ versions may need changes.
 
 ## Install
 
-With `package-vc` (Emacs 29):
+With `package-vc` (Emacs 29). expui-icons is in no package archive, so install it
+first; Vertico and posframe come from GNU ELPA:
 
 ```elisp
+(package-vc-install "https://github.com/wwulfric/expui-icons")
 (package-vc-install "https://github.com/wwulfric/palette-islands")
 ```
 

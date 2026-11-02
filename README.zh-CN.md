@@ -23,17 +23,33 @@
 
 <table>
   <tr>
-    <td width="50%" valign="top">命令列表，带按键和文档<br><a href="docs/commands.png"><img src="docs/commands.png" alt="Commands 标签列出项目相关命令，带按键和文档"></a></td>
-    <td width="50%" valign="top">当前文件的结构，按类型分组<br><a href="docs/structure.png"><img src="docs/structure.png" alt="Structure 标签按组列出文件里的变量和函数"></a></td>
+    <th width="50%">个人配置</th>
+    <th width="50%"><code>emacs -Q</code></th>
   </tr>
   <tr>
-    <td width="50%" valign="top">光标处符号下方的面板<br><a href="docs/point.png"><img src="docs/point.png" alt="光标处符号下方的面板，列出它的用法"></a></td>
-    <td width="50%" valign="top"><code>emacs -Q</code>，不加载个人配置<br><a href="docs/emacs-q.png"><img src="docs/emacs-q.png" alt="emacs -Q 下的 Palette Islands：源文件上方的搜索窗口"></a></td>
+    <td colspan="2">命令列表，带按键和文档</td>
+  </tr>
+  <tr>
+    <td valign="top"><a href="docs/commands.png"><img src="docs/commands.png" alt="个人配置下的 Commands"></a></td>
+    <td valign="top"><a href="docs/emacs-q-commands.png"><img src="docs/emacs-q-commands.png" alt="emacs -Q 下的 Commands"></a></td>
+  </tr>
+  <tr>
+    <td colspan="2">当前文件的结构，来源支持时按类型分组</td>
+  </tr>
+  <tr>
+    <td valign="top"><a href="docs/structure.png"><img src="docs/structure.png" alt="个人配置下的 Structure"></a></td>
+    <td valign="top"><a href="docs/emacs-q-structure.png"><img src="docs/emacs-q-structure.png" alt="emacs -Q 下的 Structure"></a></td>
+  </tr>
+  <tr>
+    <td colspan="2">光标处符号下方的面板</td>
+  </tr>
+  <tr>
+    <td valign="top"><a href="docs/point.png"><img src="docs/point.png" alt="个人配置下的光标处面板"></a></td>
+    <td valign="top"><a href="docs/emacs-q-point.png"><img src="docs/emacs-q-point.png" alt="emacs -Q 下的光标处面板"></a></td>
   </tr>
 </table>
 
-前三张使用了个人 Emacs 配置；最后一张保留默认字体、配色和工具栏。
-[复现这个演示](docs/screenshots.md)。
+右列保留默认字体、配色和工具栏，仅加载本包及其依赖。[复现这个演示](docs/screenshots.md)。
 
 ## 依赖
 
@@ -51,9 +67,11 @@
 
 ## 安装
 
-用 `package-vc`（Emacs 29）安装：
+用 `package-vc`（Emacs 29）安装。expui-icons 不在任何软件源里，要先装它；Vertico 和 posframe
+来自 GNU ELPA：
 
 ```elisp
+(package-vc-install "https://github.com/wwulfric/expui-icons")
 (package-vc-install "https://github.com/wwulfric/palette-islands")
 ```
 

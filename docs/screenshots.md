@@ -1,12 +1,11 @@
 # Screenshots
 
 `hero.png`, `commands.png`, `structure.png` and `point.png` show Palette Islands
-inside a personal Emacs configuration.
-`emacs-q.png` is a real window capture of graphical Emacs 31.1 on macOS,
-started with `-Q`: no init file, theme, font changes or Palette Islands
-customization. Only the package and its dependencies are loaded. The window
-size is chosen for the screenshot; fonts and native window chrome can differ
-between Emacs builds and operating systems.
+inside a personal Emacs configuration. The `emacs-q-*.png` images are real window
+captures of graphical Emacs 31.1 on macOS, started with `-Q`: no init file, theme,
+font changes or Palette Islands customization. Only the package and its
+dependencies are loaded. Fonts and native window chrome can differ between Emacs
+builds and operating systems.
 
 ## Reproduce the bare Emacs demo
 
@@ -31,6 +30,11 @@ this checkout or your Emacs configuration. The project's path is available in
 `palette-islands-demo-root` and in `*Messages*`; it can be removed after
 closing the demo Emacs.
 
+Each image is captured with the frame at 1100 × 700 content pixels. In the search
+window, `commands` has `>project` typed and `structure` `@`. `point` runs the
+snippet under "For other packages" in the README, with point on `atlas-search`; its
+three candidates are written by hand, and name real lines of the demo project.
+
 Wait for the panel to appear, then capture the Emacs window, without the
 desktop or the system's window shadow. The capture includes the native title
 bar and toolbar. No UI elements are redrawn or composited.
@@ -45,9 +49,6 @@ These images load the actual `.emacs.d/early-init.el` and `.emacs.d/init.el`,
 including its theme, islands, tabs and sidebar, in a separate graphical Emacs
 process, followed by the same demo script. Runtime files are redirected to a
 temporary `user-emacs-directory`; the existing Tree-sitter grammars are linked
-there. The frame is resized to 1100 × 700 content pixels. In the search window,
-`hero.png` has `sea` typed, `commands.png` `>project` and `structure.png` `@`.
-`point.png` runs the snippet under "For other packages" in the README, with
-point on `atlas-search`; its three candidates are written by hand, and name
-real lines of the demo project. They are window captures, including native
+there. The frame is resized to 1100 × 700 content pixels. `hero.png` has `sea`
+typed in the search window; the others are made as above. They are window captures, including native
 window chrome, with the margin described above.
