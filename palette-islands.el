@@ -565,7 +565,9 @@ Its corners are rounded and carry the outline's sides around them."
     (if (not (and palette-islands--outside (display-graphic-p)))
         text
       (palette-islands-draw-rounded-line text palette-islands-radius
-                          (palette-islands--line-height face)
+                          ;; Measuring leaves out the overline along the top,
+                          ;; which adds a pixel to the row.
+                          (+ (palette-islands--line-height face) (if top 1 0))
                           (plist-get face :background) palette-islands--outside
                           (face-background 'palette-islands-border nil t) top))))
 
