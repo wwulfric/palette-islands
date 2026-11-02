@@ -99,24 +99,46 @@ uses package faces. Nothing changes the global theme, font or mode line.
 ### Search kinds
 
 `palette-islands-search-kinds` lists the kinds, as `(KIND PREFIX LABEL COMMAND)`.
-Each command reads from the minibuffer. The defaults use only built-in commands;
-for example, to search with Consult and add a language server's symbols:
+Each command reads from the minibuffer. The defaults use only built-in commands,
+and there is no kind for the project's symbols, because how to find them depends
+on your setup.
+
+To add one, write a command and name it as a kind. This complete example uses
+only built-in xref, which asks the current buffer's backend for its identifiers:
+Emacs Lisp buffers list Lisp symbols, and other backends list what they offer.
+
+```elisp
+(require 'palette-islands-search)
+(require 'xref)
+
+(defun my-workspace-symbol ()
+  "Go to a symbol, chosen from the current xref backend's identifiers."
+  (interactive)
+  (let ((xref-prompt-for-identifier t))
+    (call-interactively #'xref-find-definitions)))
+
+(add-to-list 'palette-islands-search-kinds
+             '(symbols "#" "Symbols" my-workspace-symbol) t)
+(palette-islands-search-define symbols)
+```
+
+Typing `#` now switches to it. `palette-islands-search-define` also makes a command
+that opens the window on that kind, here `palette-islands-search-symbols`, for
+binding to a key. Commands exist already for the default kinds. Any command that
+reads from the minibuffer will do, such as one calling your language server client.
+
+To search with Consult, replace the commands of the default kinds:
 
 ```elisp
 (setq palette-islands-search-kinds
       '((files nil "Files" project-find-file)
         (commands ">" "Commands" execute-extended-command)
         (structure "@" "Structure" consult-imenu)
-        (symbols "#" "Symbols" my-workspace-symbol)
         (line ":" "Line" consult-goto-line)
         (text "%" "Text" consult-ripgrep)))
-(require 'palette-islands-search)
-(palette-islands-search-define symbols)
 ```
 
-`palette-islands-search-define` makes a command that opens the window on a kind,
-here `palette-islands-search-symbols`. Commands exist already for the default
-kinds. Keep the kind `files`: Backspace goes back to it.
+Keep the kind `files`: Backspace goes back to it.
 
 ### Size and position
 

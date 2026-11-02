@@ -94,24 +94,43 @@
 ### 搜索类型
 
 `palette-islands-search-kinds` 列出各类型，格式为 `(KIND PREFIX LABEL COMMAND)`，
-每个命令都从 minibuffer 读取。默认只用内置命令；下面的例子改用 Consult，
-并加入语言服务器的符号：
+每个命令都从 minibuffer 读取。默认只用内置命令，也没有项目符号这个类型，因为查找符号的方式
+取决于你的环境。
+
+要添加这个类型，写一个命令，再把它登记为类型即可。下面是完整的例子，只用内置的 xref，
+它向当前 buffer 的后端查询标识符：Emacs Lisp buffer 列出 Lisp 符号，其他后端列出各自提供的内容。
+
+```elisp
+(require 'palette-islands-search)
+(require 'xref)
+
+(defun my-workspace-symbol ()
+  "Go to a symbol, chosen from the current xref backend's identifiers."
+  (interactive)
+  (let ((xref-prompt-for-identifier t))
+    (call-interactively #'xref-find-definitions)))
+
+(add-to-list 'palette-islands-search-kinds
+             '(symbols "#" "Symbols" my-workspace-symbol) t)
+(palette-islands-search-define symbols)
+```
+
+之后输入 `#` 就会切换到这个类型。`palette-islands-search-define` 还会生成直接打开该类型的命令，
+这里是 `palette-islands-search-symbols`，可以绑定到按键。默认类型的命令已经存在。
+任何从 minibuffer 读取的命令都可以，比如调用语言服务器客户端的命令。
+
+要改用 Consult 搜索，替换默认类型的命令：
 
 ```elisp
 (setq palette-islands-search-kinds
       '((files nil "Files" project-find-file)
         (commands ">" "Commands" execute-extended-command)
         (structure "@" "Structure" consult-imenu)
-        (symbols "#" "Symbols" my-workspace-symbol)
         (line ":" "Line" consult-goto-line)
         (text "%" "Text" consult-ripgrep)))
-(require 'palette-islands-search)
-(palette-islands-search-define symbols)
 ```
 
-`palette-islands-search-define` 生成直接打开某个类型的命令，这里是
-`palette-islands-search-symbols`。默认类型的命令已经存在。请保留 `files` 类型，
-Backspace 会回到它。
+请保留 `files` 类型，Backspace 会回到它。
 
 ### 尺寸和位置
 
