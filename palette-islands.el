@@ -20,20 +20,29 @@
 ;; window stays selected and is scrolled out of sight, so focus never leaves
 ;; the editor frame: key maps, input methods, recursive minibuffers and
 ;; `minibuffer-message' keep working.  Messages sent meanwhile show in the
-;; panel too.  Vertico draws the candidates (see init-completion.el); this
-;; file places and frames them:
+;; panel too.  Vertico draws the candidates; this file places and frames
+;; them:
 ;;
 ;;     Recent                                         title
-;;     🔍 init                                        input
+;;     🔍 sea                                         input
 ;;     ──────────────────────────────────────────     divider
 ;;     BUFFER                                         group title
-;;   ( 📄 init-lsp.el                        lisp )   selected row
-;;     📄 init-completion.el                 lisp
+;;   ( 📄 search.el                           src )   selected row
+;;     📄 research.md                        docs
 ;;
 ;; Titles, icons and the footer share an outer column; the input and the
 ;; candidates' names an inner one.  The selected row is a pill (see Pills
 ;; in palette-islands-draw.el), so rows take their heights from struts rather than
 ;; from `line-spacing'.
+;;
+;; Nothing changes until `palette-islands-mode' is on, and nothing is bound
+;; by default; bind the commands, or `palette-islands-command-map':
+;;
+;;   (keymap-global-set "C-c p" palette-islands-command-map)
+;;
+;; The panel asks the editor around it through the variables in
+;; palette-islands-env.el and draws with the faces and sizes here.  Their
+;; defaults work in a bare Emacs; a configuration can tie them to its look.
 
 ;;; Code:
 
@@ -109,41 +118,61 @@ may move once the minibuffer opens.  Nil places the panel under the symbol
 at point.  Let-bind it, with `palette-islands-placement', to drop a panel down
 from a button.")
 
-(defvar palette-islands-actions
+(defcustom palette-islands-actions
   '((consult-buffer "<" "Narrow"))
   "Keys named at the right of the footer, by command, as (KEY DESCRIPTION).
-See `palette-islands-set-action'.")
+See `palette-islands-set-action'."
+  :type '(alist :key-type symbol :value-type (list string string))
+  :group 'palette-islands)
 
-(defvar palette-islands-top 0.12
-  "Top edge of the palette as a fraction of the frame height.")
+(defcustom palette-islands-top 0.12
+  "Top edge of the palette as a fraction of the frame height."
+  :type 'number
+  :group 'palette-islands)
 
-(defvar palette-islands-width '(0.55 72 . 120)
-  "Palette width: fraction of the frame, then minimum and maximum columns.")
+(defcustom palette-islands-width '(0.55 72 . 120)
+  "Palette width: fraction of the frame, then minimum and maximum columns."
+  :type '(cons number (cons integer integer))
+  :group 'palette-islands)
 
-(defvar palette-islands-point-width '(48 . 100)
-  "Minimum and maximum columns of the panel at point.")
+(defcustom palette-islands-point-width '(48 . 100)
+  "Minimum and maximum columns of the panel at point."
+  :type '(cons integer integer)
+  :group 'palette-islands)
 
-(defvar palette-islands-rows '((palette . 14) (point . 8))
-  "Candidates shown by each placement.")
+(defcustom palette-islands-rows '((palette . 14) (point . 8))
+  "Candidates shown by each placement."
+  :type '(alist :key-type symbol :value-type integer)
+  :group 'palette-islands)
 
 (defconst palette-islands-padding 12
   "Horizontal padding inside the panel, in pixels.")
 
-(defvar palette-islands-radius 8
-  "Radius of the panel's rounded corners, in pixels.")
+(defcustom palette-islands-radius 8
+  "Radius of the panel's rounded corners, in pixels."
+  :type 'integer
+  :group 'palette-islands)
 
-(defvar palette-islands-edge-height 80
+(defcustom palette-islands-edge-height 80
   "Height in 1/10 pt of the empty mode line padding the panel's bottom.
-It ends a panel that has no footer band.")
+It ends a panel that has no footer band."
+  :type 'integer
+  :group 'palette-islands)
 
-(defvar palette-islands-header-height 0.85
-  "Height of the title line relative to the panel text.")
+(defcustom palette-islands-header-height 0.85
+  "Height of the title line relative to the panel text."
+  :type 'number
+  :group 'palette-islands)
 
-(defvar palette-islands-header-padding 8
-  "Space above and below the title line, in pixels.")
+(defcustom palette-islands-header-padding 8
+  "Space above and below the title line, in pixels."
+  :type 'integer
+  :group 'palette-islands)
 
-(defvar palette-islands-input-height 1.1
-  "Height of the input relative to the candidates.")
+(defcustom palette-islands-input-height 1.1
+  "Height of the input relative to the candidates."
+  :type 'number
+  :group 'palette-islands)
 
 (defconst palette-islands-indent 28
   "Pixels before the input and candidate text, holding the bar and icons.")
@@ -159,21 +188,54 @@ the input and the candidates' names start at `palette-islands-indent'.")
 (defconst palette-islands-text-end-inset (* 2 palette-islands-pill-radius)
   "Pixels between candidates' right-aligned text and the selection's end.")
 
-(defvar palette-islands-row-height 1.85
-  "Height of a candidate row, in frame character units.")
+(defcustom palette-islands-row-height 1.85
+  "Height of a candidate row, in frame character units."
+  :type 'number
+  :group 'palette-islands)
 
-(defvar palette-islands-input-padding '(14 . 4)
+(defcustom palette-islands-input-padding '(14 . 4)
   "Pixels above and below the input, as (ABOVE . BELOW).
 BELOW adds to the divider row's upper half, so that the input sits midway
 between the header's band and the divider.  The cursor runs from the top
 of its row, so a strut would lift it off the text; lines this high pad
-the input instead.")
+the input instead."
+  :type '(cons integer integer)
+  :group 'palette-islands)
 
-(defvar palette-islands-group-row-height 1.6
-  "Height of a group title row, in frame character units.")
+(defcustom palette-islands-group-row-height 1.6
+  "Height of a group title row, in frame character units."
+  :type 'number
+  :group 'palette-islands)
 
-(defvar palette-islands-divider-height 1.0
-  "Height of the row holding the divider, in frame character units.")
+(defcustom palette-islands-divider-height 1.0
+  "Height of the row holding the divider, in frame character units."
+  :type 'number
+  :group 'palette-islands)
+
+;;;###autoload
+(autoload 'palette-islands-search "palette-islands-search" nil t)
+;;;###autoload
+(autoload 'palette-islands-search-files "palette-islands-search" nil t)
+;;;###autoload
+(autoload 'palette-islands-search-commands "palette-islands-search" nil t)
+;;;###autoload
+(autoload 'palette-islands-search-structure "palette-islands-search" nil t)
+;;;###autoload
+(autoload 'palette-islands-search-line "palette-islands-search" nil t)
+;;;###autoload
+(autoload 'palette-islands-search-text "palette-islands-search" nil t)
+
+;;;###autoload
+(defvar palette-islands-command-map
+  (let ((map (make-sparse-keymap)))
+    (define-key map "s" #'palette-islands-search)
+    (define-key map "f" #'palette-islands-search-files)
+    (define-key map "x" #'palette-islands-search-commands)
+    (define-key map "i" #'palette-islands-search-structure)
+    (define-key map "l" #'palette-islands-search-line)
+    (define-key map "t" #'palette-islands-search-text)
+    map)
+  "Commands of the search window, to bind under a prefix.")
 
 (defun palette-islands--strut (height)
   "Return a strut making its row HEIGHT frame character units high."
@@ -865,6 +927,8 @@ It is an `:align-to' position clear of the selected row's rounded end."
           palette-islands--title (palette-islands--title))
     (setq-local eldoc-display-functions (list #'palette-islands--eldoc-display))
     (setq-local vertico-count (alist-get palette-islands--placement palette-islands-rows)
+                ;; The input's column holds the search icon, not a count.
+                vertico-count-format nil
                 truncate-lines t
                 ;; The selected row reaches the edge; the fringes are padding.
                 fringe-indicator-alist (cons '(truncation nil nil) fringe-indicator-alist)

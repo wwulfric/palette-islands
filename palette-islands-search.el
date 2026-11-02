@@ -15,8 +15,8 @@
 ;; character, so there another prefix needs that Backspace first.  Tabs in
 ;; the panel's header (palette-islands.el) show the kind and switch on click,
 ;; keeping the input.  The keys of each picker open the window on its tab.
-;; The kinds are `palette-islands-search-kinds' (palette-islands-env.el), each a command that reads
-;; from the minibuffer; this file binds no keys.
+;; The kinds are `palette-islands-search-kinds' (palette-islands-env.el), each
+;; a command that reads from the minibuffer; this file binds no keys.
 
 ;;; Code:
 

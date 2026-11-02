@@ -18,6 +18,13 @@
   (should-not palette-islands-mode)
   (should-not (memq #'palette-islands--setup minibuffer-setup-hook)))
 
+(ert-deftest palette-islands-command-map-binds-commands ()
+  "Each key of the command map runs a command."
+  (map-keymap (lambda (_key command) (should (commandp command)))
+              palette-islands-command-map)
+  (should (eq (keymap-lookup palette-islands-command-map "s")
+              #'palette-islands-search)))
+
 (ert-deftest palette-islands-mode-toggles ()
   "The mode's hooks and advice come and go with it."
   (unwind-protect
