@@ -50,6 +50,7 @@
 (require 'expui-icons)
 (require 'thingatpt)
 (require 'seq)
+(require 'cl-lib)
 (require 'vertico)
 (require 'palette-islands-env)
 (require 'palette-islands-draw)
@@ -1129,6 +1130,19 @@ start of the text; let it happen first, or it undoes the hiding."
   (redisplay t)
   (palette-islands--after-exit buffer))
 
+(defvar palette-islands--wheel-bindings nil
+  "Wheel bindings to restore when the panel mode is disabled.")
+
+(defvar palette-islands--consult-recenter-replaced nil
+  "Non-nil when the panel replaced Consult's recenter hook.")
+
+(defun palette-islands--consult-recenter ()
+  "Replace Consult's recenter hook only when it was enabled by the user."
+  (when (and palette-islands-mode (memq #'recenter consult-after-jump-hook))
+    (setq palette-islands--consult-recenter-replaced t
+          consult-after-jump-hook
+          (cl-substitute #'palette-islands-recenter #'recenter consult-after-jump-hook))))
+
 ;;;###autoload
 (define-minor-mode palette-islands-mode
   "Show the minibuffer in a floating panel instead of the echo area."
@@ -1140,8 +1154,12 @@ start of the text; let it happen first, or it undoes the hiding."
         (add-hook 'minibuffer-exit-hook #'palette-islands--nested-exit)
         (add-hook 'minibuffer-setup-hook #'palette-islands-candidates-forget-roots)
         (advice-add 'posframe--fit-frame-to-buffer :around #'palette-islands--fit)
-        (keymap-set vertico-map "<wheel-up>" #'palette-islands-scroll)
-        (keymap-set vertico-map "<wheel-down>" #'palette-islands-scroll)
+        (unless palette-islands--wheel-bindings
+          (setq palette-islands--wheel-bindings
+                (mapcar (lambda (key) (cons key (keymap-lookup vertico-map key)))
+                        '("<wheel-up>" "<wheel-down>"))))
+        (dolist (entry palette-islands--wheel-bindings)
+          (keymap-set vertico-map (car entry) #'palette-islands-scroll))
         (advice-add 'vertico--display-candidates :after #'palette-islands--after-candidates)
         (advice-add 'vertico--resize-window :around #'palette-islands--vertico-resize)
         (advice-add 'vertico--display-candidates :filter-args
@@ -1154,26 +1172,25 @@ start of the text; let it happen first, or it undoes the hiding."
         (advice-add 'vertico--format-group-title :filter-return
                     #'palette-islands--format-group-title)
         (with-eval-after-load 'consult
-          (when palette-islands-mode
-            (setq consult-after-jump-hook
-                  (cons #'palette-islands-recenter
-                        (remq #'recenter (remq #'palette-islands-recenter
-                                               consult-after-jump-hook)))))))
+          (palette-islands--consult-recenter)))
     (remove-hook 'minibuffer-setup-hook #'palette-islands--setup)
     (remove-hook 'minibuffer-exit-hook #'palette-islands--nested-exit)
     (remove-hook 'minibuffer-setup-hook #'palette-islands-candidates-forget-roots)
     (advice-remove 'posframe--fit-frame-to-buffer #'palette-islands--fit)
-    (keymap-unset vertico-map "<wheel-up>")
-    (keymap-unset vertico-map "<wheel-down>")
+    (dolist (entry palette-islands--wheel-bindings)
+      (when (eq (keymap-lookup vertico-map (car entry)) #'palette-islands-scroll)
+        (keymap-set vertico-map (car entry) (cdr entry))))
+    (setq palette-islands--wheel-bindings nil)
     (advice-remove 'vertico--display-candidates #'palette-islands--after-candidates)
     (advice-remove 'vertico--resize-window #'palette-islands--vertico-resize)
     (advice-remove 'vertico--display-candidates #'palette-islands--divider-args)
     (advice-remove 'vertico--format-candidate #'palette-islands--format-candidate)
     (advice-remove 'vertico--format-candidate #'palette-islands-candidates-format)
     (advice-remove 'vertico--format-group-title #'palette-islands--format-group-title)
-    (when (boundp 'consult-after-jump-hook)
+    (when palette-islands--consult-recenter-replaced
       (setq consult-after-jump-hook
-            (cons #'recenter (remq #'palette-islands-recenter consult-after-jump-hook))))))
+            (cl-substitute #'recenter #'palette-islands-recenter consult-after-jump-hook)
+            palette-islands--consult-recenter-replaced nil))))
 
 (provide 'palette-islands)
 ;;; palette-islands.el ends here

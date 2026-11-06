@@ -7,6 +7,7 @@
 
 (require 'ert)
 (require 'palette-islands-search)
+(defvar consult-after-jump-hook)
 
 (ert-deftest palette-islands-loads-alone ()
   "The panel loads with its dependencies only."
@@ -79,6 +80,36 @@
 (ert-deftest palette-islands-draw-fit-left-keeps-the-end ()
   (should (equal (palette-islands-draw-fit-left "abcdef" 10) "abcdef"))
   (should (equal (palette-islands-draw-fit-left "abcdef" 4) "…def")))
+
+(ert-deftest palette-islands-mode-restores-wheel-bindings ()
+  (let ((vertico-map (make-sparse-keymap))
+        (palette-islands--wheel-bindings nil))
+    (keymap-set vertico-map "<wheel-up>" #'previous-line)
+    (keymap-set vertico-map "<wheel-down>" #'next-line)
+    (unwind-protect
+        (progn
+          (palette-islands-mode 1)
+          (palette-islands-mode 1)
+          (should (eq (keymap-lookup vertico-map "<wheel-up>") #'palette-islands-scroll))
+          (palette-islands-mode -1)
+          (should (eq (keymap-lookup vertico-map "<wheel-up>") #'previous-line))
+          (should (eq (keymap-lookup vertico-map "<wheel-down>") #'next-line)))
+      (palette-islands-mode -1))))
+
+(ert-deftest palette-islands-mode-respects-consult-recenter-choice ()
+  (dolist (hook '(nil (ignore) (ignore recenter) ((lambda () (recenter)) recenter)))
+    (let ((consult-after-jump-hook (copy-sequence hook))
+          (palette-islands--consult-recenter-replaced nil))
+      (unwind-protect
+          (progn
+            (palette-islands-mode 1)
+            (palette-islands--consult-recenter)
+            (palette-islands--consult-recenter)
+            (should (equal consult-after-jump-hook
+                           (cl-substitute #'palette-islands-recenter #'recenter hook)))
+            (palette-islands-mode -1)
+            (should (equal consult-after-jump-hook hook)))
+        (palette-islands-mode -1)))))
 
 (provide 'palette-islands-tests)
 ;;; palette-islands-tests.el ends here
